@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<meta charset="utf-8">
+        <title>Happy, Sad, Angry</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename = 'css/normalize.css') }}">
+		<link href='http://fonts.googleapis.com/css?family=Raleway:400,700,900|Montserrat:400,700' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" href="{{ url_for('static', filename = 'css/main.css') }}">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+
+	<style>
+	#videoElement {
+		/*Mirror code starts*/
+		transform: rotateY(180deg);
+		-webkit-transform:rotateY(180deg); /* Safari and Chrome */
+		-moz-transform:rotateY(180deg); /* Firefox */
+		/*Mirror code ends*/
+	}
+
+</style>
+
+    <body>
+		<header>
+			<a href="index.html" id = "logo">
+				<h1> Control your snaaaaake!!!</h1>
+			</a>
+    </header>
+			
+			<div style="width: 600px; display: table-cell;">
+				<iframe src="https://slither.io" width = 1200px height = 600px style="display: table;"></iframe>
+			</div>
+			<div style="display: table-cell;"> 
+				<video autoplay="true" id="videoElement" width = 300px></video>
+				<script>
+					window.addEventListener("DOMContentLoaded", updateCursorPosition)
+					var video = document.querySelector("#videoElement");
+					if (navigator.mediaDevices.getUserMedia) {
+						const getImage = async () => {
+							video.srcObject = await navigator.mediaDevices.getUserMedia({ video: true })
+							video.play();
+						}
+						getImage();
+					}
+					
+					function updateCursorPosition() {
+						var canvas = document.createElement('canvas');
+						canvas.width = 300;
+						canvas.height = 225;
+						var context = canvas.getContext('2d');
+						context.drawImage(video, 0, 0, canvas.width, canvas.height);
+						var data = {'image_base64': canvas.toDataURL("image/png")}
+						const getResult = async () => {
+							var result = await fetch('loop', {
+								method: 'POST',
+								body: JSON.stringify(data),
+						    headers: { 'Content-Type': 'application/json' }
+							})
+						var jsonResult = await result.json()
+						document.getElementById("fun").innerHTML = jsonResult.fun*2;						
+						}
+						getResult()		
+						setTimeout(updateCursorPosition, 50)
+					}
+
+				</script>
+			</div>
+			<div id = "fun"></div>
+        <footer>
+					<a href="https://github.com/Evanev7/OxHack19"><img src="{{ url_for('static', filename = 'img/gitlogo.png') }}" alt="VKontavte logo." class="social-icon"></a>
+		</footer>
+		<footer>&copy; 2019 OxHack Team KCLMS</footer>
+    </body>
+</html>
